@@ -1,0 +1,23 @@
+output := ""
+
+def i_to_f(i) {
+    if i % 3 == 0 {
+        return "fizz"
+    }
+
+    if i % 5 == 0 {
+        return "buzz"
+    }
+
+    return i
+}
+
+# iterative
+for i in (1 to 100) {
+    output += i_to_f(i) + " "
+}
+
+print output
+
+# real goal :3
+(1 to 100) map i_to_f then print 
