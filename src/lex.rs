@@ -1,8 +1,9 @@
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Token {
     LBrace,
     RBrace,
     Comma,
+    Semicolon,
     LParen,
     RParen,
     If,
@@ -28,7 +29,7 @@ pub enum Token {
     Not,
     While,
     For,
-    Def,
+    Fn,
     IntLit(i64),
     FloatLit(f64),
     StringLit(String),
@@ -39,14 +40,14 @@ pub enum Token {
 
 #[derive(Clone, Copy, Debug)]
 pub struct CodeLoc {
-    line: usize,
-    col: usize,
+    pub line: usize,
+    pub col: usize,
 }
 #[derive(Clone, Debug)]
 pub struct TokenLoc {
-    token: Token,
-    start: CodeLoc,
-    end: CodeLoc,
+    pub token: Token,
+    pub start: CodeLoc,
+    pub end: CodeLoc,
 }
 
 pub struct Lexer<'a> {
@@ -134,6 +135,8 @@ impl<'a> Lexer<'a> {
                 '-' => self.emit(Token::Minus),
                 '*' => self.emit(Token::Times),
                 ':' => self.emit(Token::Colon),
+                ',' => self.emit(Token::Comma),
+                ';' => self.emit(Token::Semicolon),
                 '\'' | '\"' => {
                     let s = self.lex_string(c);
                     self.emit(Token::StringLit(s))
@@ -191,7 +194,8 @@ impl<'a> Lexer<'a> {
                             "or" => Token::Or,
                             "not" => Token::Not,
                             "continue" => Token::Continue,
-                            "return" => Token::Return,
+                            "fn" => Token::Fn,
+                            //"return" => Token::Return, // TODO: is this an identifier??
                             _ => Token::Identifier(acc)
                         })
                     }
@@ -204,8 +208,6 @@ impl<'a> Lexer<'a> {
                             last = *cc;
                             self.next();
                         }
-
-                        
 
                         match (acc.as_str(), last) {
                             ("!" | "<" | ">" | "=", '=') => {
